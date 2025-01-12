@@ -14,17 +14,27 @@ import { BranchStep } from "./branch-step";
 import { USNUsernameStep } from "./usn-username-step";
 import { SocialLinksStep } from "./social-links-step";
 import { InterestsStep } from "./interests-step";
+import { api } from "@/trpc/react";
+
+import { useRouter } from "next/navigation";
 
 const steps = ["USN & Username", "Branch", "Social Links", "Interests"];
 
-export function MultiStepForm() {
+export function MultiStepForm({ userId }: { userId: string }) {
   const [currentStep, setCurrentStep] = useState(0);
+  const router = useRouter();
   const [formData, setFormData] = useState({
+    userId: userId,
     usn: "",
     username: "",
     branch: "",
     socialLinks: { github: "", linkedin: "", twitter: "" },
     interests: [],
+  });
+  const Createstudent = api.students.create.useMutation({
+    onSuccess: () => {
+      router.push("/feed");
+    },
   });
 
   const updateFormData = (stepData: Partial<typeof formData>) => {
@@ -52,6 +62,12 @@ export function MultiStepForm() {
 
   const handleSubmit = () => {
     console.log("Form submitted:", formData);
+    try {
+      Createstudent.mutate(formData);
+      router.push("/feed");
+    } catch (e) {
+      console.error(e);
+    }
     // Here you would typically send the data to your backend
   };
 
@@ -76,7 +92,7 @@ export function MultiStepForm() {
               </div>
             ))}
           </div>
-          <div className="h-2 w-full rounded-full bg-secondary">
+          <div className="bg-secondary h-2 w-full rounded-full">
             <div
               className="h-2 rounded-full bg-black transition-all duration-300 ease-in-out"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}

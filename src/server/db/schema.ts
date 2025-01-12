@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
+  json,
   pgTableCreator,
   primaryKey,
   text,
@@ -17,7 +18,24 @@ import { type AdapterAccount } from "next-auth/adapters";
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
 export const createTable = pgTableCreator((name) => `bitscenes_${name}`);
-
+export const students = createTable("students", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+    userId : varchar("userId",{length:50}).notNull(), // Unique user ID with default UUID
+  usn: varchar("usn", { length: 50 }).notNull(), // USN
+  username: varchar("username", { length: 255 }).notNull(), // Username
+  branch: varchar("branch", { length: 255 }).notNull(), // Branch
+  socialLinks: json("social_links")
+    .notNull()
+    .$type<{
+      github: string;
+      linkedin: string;
+      twitter: string;
+    }>(), // Social links as a JSON object
+  interests: varchar("intrests").array().notNull(), // Interests as an array of strings
+});
 export const posts = createTable(
   "post",
   {

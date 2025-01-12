@@ -1,0 +1,1 @@
+ALTER TABLE "bitscenes_students" ADD COLUMN "userId" varchar(50) NOT NULL;

@@ -24,7 +24,7 @@ export default async function Home() {
               Join BS NOW
             </h1>
           </div>
-          <MultiStepForm />
+          <MultiStepForm userId={session.user.id} />
         </main>
       </div>
     </HydrateClient>
