@@ -20,15 +20,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <TRPCReactProvider>
-          <div className="bg-background flex min-h-screen">
-            <LeftSidebar />
-            <main className="min-h-screen flex-1 border-l border-r border-border">
-              {children}
-            </main>
-            <RightSidebar />
-          </div>
-        </TRPCReactProvider>
+        {/* <TRPCReactProvider> */}
+        <div className="bg-background flex min-h-screen">
+          <LeftSidebar />
+          <main className="min-h-screen flex-1 border-l border-r border-border">
+            {children}
+          </main>
+          <RightSidebar />
+        </div>
+        {/* </TRPCReactProvider> */}
       </body>
     </html>
   );

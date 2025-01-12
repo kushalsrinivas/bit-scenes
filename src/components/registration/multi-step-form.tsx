@@ -70,6 +70,10 @@ export function MultiStepForm({ userId }: { userId: string }) {
     }
     // Here you would typically send the data to your backend
   };
+  const { data } = api.students.getById.useQuery({ userId: userId });
+  if (data) {
+    router.push("/feed");
+  }
 
   return (
     <Card className="mx-auto w-full max-w-lg">

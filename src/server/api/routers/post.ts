@@ -16,17 +16,39 @@ export const postRouter = createTRPCRouter({
       };
     }),
 
-  create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    create: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string().min(1), // User ID from the students table
+        content: z.string().min(1), // Post content
+      })
+    )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(posts).values({
-        name: input.name,
-        createdById: ctx.session.user.id,
+      // Fetch student data based on userId
+      const student = await ctx.db.query.students.findFirst({
+        where: (students, { eq }) => eq(students.userId, input.userId),
       });
+  
+      if (!student) {
+        throw new Error("Student not found");
+      }
+  
+      // Insert a new post with the retrieved student data
+      await ctx.db.insert(posts).values({
+        name : student.username,
+        createdById: ctx.session.user.id,
+        content: input.content,
+        // Optionally include student data in the post or logs
+      });
+  
+      return {
+        message: "Post created successfully!",
+        student, // Optionally return the student data for client-side usage
+      };
     }),
 
   getLatest: protectedProcedure.query(async ({ ctx }) => {
-    const post = await ctx.db.query.posts.findFirst({
+    const post = await ctx.db.query.posts.findMany({
       orderBy: (posts, { desc }) => [desc(posts.createdAt)],
     });
 

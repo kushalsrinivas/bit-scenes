@@ -54,10 +54,10 @@ export const studentsRouter = createTRPCRouter({
 
   // Protected procedure to fetch a specific student by ID
   getById: publicProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ userId: z.string() }))
     .query(async ({ ctx, input }) => {
       const student = await ctx.db.query.students.findFirst({
-        where: (students, { eq }) => eq(students.id, input.id),
+        where: (students, { eq }) => eq(students.userId, input.userId),
       });
 
       return student ?? null;

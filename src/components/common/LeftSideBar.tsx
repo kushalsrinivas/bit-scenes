@@ -13,18 +13,18 @@ import {
   User,
   MoreHorizontal,
   Twitter,
+  Mic,
+  ClipboardCheck,
+  Voicemail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Explore", href: "/explore", icon: Search },
-  { name: "Notifications", href: "/notifications", icon: Bell },
-  { name: "Messages", href: "/messages", icon: Mail },
-  { name: "Communities", href: "/communities", icon: Users },
-  { name: "Premium", href: "/premium", icon: Twitter },
-  { name: "Profile", href: "/profile", icon: User },
-  { name: "More", href: "/more", icon: MoreHorizontal },
+  { name: "Home", href: "/feed", icon: Home },
+  { name: "confessions", href: "/feed/confessions", icon: Voicemail },
+  { name: "jobs", href: "/feed/jobs", icon: ClipboardCheck },
+  //   { name: "clubs", href: "/communities", icon: Users },
+  { name: "Profile", href: "/feed/profile", icon: User },
 ];
 
 export function LeftSidebar() {
@@ -33,7 +33,7 @@ export function LeftSidebar() {
   return (
     <div className="hidden w-[275px] flex-col gap-4 p-4 md:flex">
       <Link href="/" className="p-2">
-        <Twitter className="h-8 w-8" />
+        <div className="h-8 w-8 text-3xl font-black">BS</div>
       </Link>
       <nav className="flex flex-col gap-2">
         {navigation.map((item) => (

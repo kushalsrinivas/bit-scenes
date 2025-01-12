@@ -1,0 +1,1 @@
+ALTER TABLE "bitscenes_post" ADD COLUMN "content" varchar(256);

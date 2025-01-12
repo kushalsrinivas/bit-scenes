@@ -12,10 +12,17 @@ import {
   Smile,
   Calendar,
 } from "lucide-react";
+import { api } from "@/trpc/react";
 
-export function ComposePost() {
+export function ComposePost({ userId }: { userId: string }) {
   const [content, setContent] = useState("");
-
+  const post = api.post.create.useMutation();
+  const handleSubmit = () => {
+    if (content.trim().length !== 0) {
+      post.mutate({ userId: userId, content: content });
+      setContent("");
+    }
+  };
   return (
     <div className="border-b border-border p-4">
       <div className="flex gap-4">
@@ -51,7 +58,9 @@ export function ComposePost() {
                 <MapPin className="h-4 w-4" />
               </Button>
             </div>
-            <Button className="rounded-full">Post</Button>
+            <Button onClick={handleSubmit} className="rounded-full">
+              Post
+            </Button>
           </div>
         </div>
       </div>
