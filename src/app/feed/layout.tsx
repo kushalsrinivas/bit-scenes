@@ -5,6 +5,8 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { Sidebar } from "@/components/common/SideBar";
+import { LeftSidebar } from "@/components/common/LeftSideBar";
+import { RightSidebar } from "@/components/common/RightSideBar";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -19,9 +21,12 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <TRPCReactProvider>
-          <div className="flex flex-row">
-            <Sidebar></Sidebar>
-            {children}
+          <div className="bg-background flex min-h-screen">
+            <LeftSidebar />
+            <main className="min-h-screen flex-1 border-l border-r border-border">
+              {children}
+            </main>
+            <RightSidebar />
           </div>
         </TRPCReactProvider>
       </body>
