@@ -14,7 +14,7 @@ export default async function Home() {
         <h1 className="text-xl font-bold">Home</h1>
       </div>
       <ComposePost userId={session.user.id} />
-      <Feed />
+      <Feed userId={session.user.id} />
     </div>
   );
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "bitscenes_post" ALTER COLUMN "likes" SET DATA TYPE numeric;

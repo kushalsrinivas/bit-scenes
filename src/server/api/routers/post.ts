@@ -5,7 +5,8 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
-import { posts } from "@/server/db/schema";
+import { postLikes, posts, students } from "@/server/db/schema";
+import { desc, eq, like, sql } from "drizzle-orm";
 
 export const postRouter = createTRPCRouter({
   hello: publicProcedure
@@ -46,14 +47,83 @@ export const postRouter = createTRPCRouter({
         student, // Optionally return the student data for client-side usage
       };
     }),
+    incrementLikes: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string().min(1), // The ID of the post to increment likes for
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id; // Get the logged-in user's ID
+  
+      // Check if the user has already liked the post
+      const existingLike = await ctx.db.query.postLikes.findFirst({
+        where: (like) => eq(like.postId, input.postId) && eq(like.userId, userId),
+      });
+  
+      if (existingLike) {
+        throw new Error("You have already liked this post.");
+      }
+  
+      // Increment the likes count on the post
+  
+      // Add an entry to the postLikes table
+      await ctx.db.insert(postLikes).values({
+        id: crypto.randomUUID(),
+        postId: input.postId,
+        userId,
 
-  getLatest: protectedProcedure.query(async ({ ctx }) => {
-    const post = await ctx.db.query.posts.findMany({
-      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-    });
+      });
+  
+      return { message: "Post liked successfully!" };
+    }),
+    getPostsWithDetails: protectedProcedure.query(async ({ ctx }) => {
+      const tweets = await ctx.db
+        .select({
+          post: posts,
+          likes: postLikes,
+        })
+        .from(posts)
+        .leftJoin(postLikes, eq(posts.postId, postLikes.postId))
+        .orderBy(desc(posts.createdAt));
+    
+      if (tweets) {
+        // Group likes by postId
+        const postsMap = tweets.reduce((acc, tweet) => {
+          const postId = tweet.post.postId;
+    
+          if (!acc[postId]) {
+            acc[postId] = {
+              postId: tweet.post.postId,
+              id: tweet.post.id,
+              name: tweet.post.name,
+              content: tweet.post.content,
+              likes: [],
+              createdAt: tweet.post.createdAt,
+            };
+          }
+    
+          // Add the like to the respective post's likes array if it exists
+          if (tweet.likes) {
+            acc[postId].likes.push(tweet.likes);
+          }
+    
+          return acc;
+        }, {});
+    
+        // Convert the object back into an array
+        return Object.values(postsMap);
+      }
+    
+      return tweets ?? null;
+    }),
+  // getLatest: protectedProcedure.query(async ({ ctx }) => {
+  //   const post = await ctx.db.query.posts.findMany({
+  //     orderBy: (posts, { desc }) => [desc(posts.createdAt)],
+  //   });
 
-    return post ?? null;
-  }),
+  //   return post ?? null;
+  // }),
 
   getSecretMessage: protectedProcedure.query(() => {
     return "you can now see this secret message!";

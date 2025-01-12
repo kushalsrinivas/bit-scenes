@@ -1,0 +1,1 @@
+ALTER TABLE "bitscenes_post" ADD COLUMN "postId" varchar(255) NOT NULL;

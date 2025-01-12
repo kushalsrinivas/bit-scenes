@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Home,
@@ -50,7 +50,14 @@ export function LeftSidebar() {
           </Link>
         ))}
       </nav>
-      <Button className="mt-4 h-12 rounded-full text-lg">Post</Button>
+      <Button
+        onClick={() => {
+          redirect("/api/auth/signout");
+        }}
+        className="mt-4 h-12 rounded-full text-lg"
+      >
+        logout
+      </Button>
     </div>
   );
 }

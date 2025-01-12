@@ -5,27 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { api } from "@/trpc/react";
 import { MessageCircle, Heart, Repeat2, Share } from "lucide-react";
+interface Tweet {
+  postId: string; // The unique identifier for the post
+  id: string; // ID of the post
+  name: string; // Name of the user who created the post
+  content: string; // The content of the post
+  likes: Like[]; // Array of likes for the post
+  createdAt: string; // Timestamp of when the post was created
+}
 
-const tweets = [
-  {
-    id: 1,
-    author: "Varsha Singh",
-    handle: "@varshaparmar06",
-    avatar: "/placeholder.svg?height=40&width=40",
-    content: `A wholesome thread on Simple Ideas can have big Impacts
+interface Like {
+  likeId: string; // Unique identifier for the like
+  userId: string; // ID of the user who liked the post
+  createdAt: string; // Timestamp of when the like was created
+}
 
-Don't open if you can't handle too much excitement⚡️
+export function Feed({ userId }: { userId: string }) {
+  const { data } = api.post.getPostsWithDetails.useQuery();
+  const likes = api.post.incrementLikes.useMutation();
 
-1. Boston moved it's highway underground in 2003. This was the result.`,
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-01-12%20at%209.51.22%E2%80%AFPM-ae6wIBPJP3TUX7JRL55W3VozOoJotz.png",
-    date: "Jan 11",
-  },
-  // Add more tweets as needed
-];
-
-export function Feed() {
-  const { data } = api.post.getLatest.useQuery();
   if (!data) {
     return <div>loading</div>;
   }
@@ -68,15 +66,26 @@ export function Feed() {
     const diffInYears = Math.floor(diffInDays / 365);
     return `${diffInYears} years ago`;
   }
+
+  const handleLike = (postId: string) => {
+    likes.mutate({ postId: postId });
+  };
+  const handleComment = () => {
+    console.log("comment");
+  };
+  const handleShare = () => {
+    console.log("share");
+  };
+
   return (
     <div>
-      {data.map((tweet) => (
+      {(data as Tweet[]).map((tweet: Tweet) => (
         <Card key={tweet.id} className="rounded-none border-x-0 border-t-0 p-4">
           <div className="flex gap-4">
             <Avatar>
               <AvatarImage className="bg-white" src={""} />
               <AvatarFallback className="bg-white">
-                {tweet.name!.substring(0, 3)}
+                {tweet.name.substring(0, 3)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -90,16 +99,26 @@ export function Feed() {
               <p className="mt-2 whitespace-pre-wrap">{tweet.content}</p>
 
               <div className="text-muted-foreground mt-4 flex justify-between">
-                <Button variant="default" size="icon">
+                <Button onClick={handleComment} variant="default" size="icon">
                   <MessageCircle className="h-4 w-4" />
                 </Button>
-                <Button variant="default" size="icon">
-                  <Repeat2 className="h-4 w-4" />
-                </Button>
-                <Button variant="default" size="icon">
+
+                <Button
+                  onClick={() => {
+                    handleLike(tweet.postId);
+                  }}
+                  variant="default"
+                  size="icon"
+                  disabled={
+                    (tweet.likes.length > 0 &&
+                      tweet.likes.some((like) => like.userId === userId)) ||
+                    tweet.likes.length === 0
+                  }
+                >
                   <Heart className="h-4 w-4" />
+                  {tweet.likes.length === 0 ? 1 : tweet.likes.length}
                 </Button>
-                <Button variant="default" size="icon">
+                <Button onClick={handleShare} variant="default" size="icon">
                   <Share className="h-4 w-4" />
                 </Button>
               </div>

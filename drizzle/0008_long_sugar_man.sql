@@ -1,0 +1,1 @@
+ALTER TABLE "bitscenes_post" DROP COLUMN IF EXISTS "likes";

@@ -3,6 +3,7 @@ import {
   index,
   integer,
   json,
+  numeric,
   pgTableCreator,
   primaryKey,
   text,
@@ -40,6 +41,9 @@ export const posts = createTable(
   "post",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    postId  : varchar("postId", { length: 255 })
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
     name: varchar("name", { length: 256 }),
     content  :varchar("content",{length:256}),
     createdById: varchar("created_by", { length: 255 })
@@ -48,6 +52,8 @@ export const posts = createTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
+    parentPostId : integer("parent_post_id"),
+
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date()
     ),
@@ -70,6 +76,19 @@ export const users = createTable("user", {
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
+});
+export const postLikes = createTable("postLikes", {
+  id: varchar("id", { length: 255 }).primaryKey().notNull(),
+  
+  postId: varchar("post_id", { length: 255 })
+    .notNull()
+,
+  
+  userId: varchar("user_id", { length: 255 })
+    .notNull()
+
+  
+ 
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
