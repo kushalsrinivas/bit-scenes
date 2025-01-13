@@ -117,6 +117,52 @@ export const postRouter = createTRPCRouter({
     
       return tweets ?? null;
     }),
+    getPostDetails: protectedProcedure
+    .input(z.object({ postId: z.string() })) // Validate the input, expecting postId
+    .query(async ({ ctx, input }) => {
+      const { postId } = input;
+  
+      const tweets = await ctx.db
+        .select({
+          post: posts,
+          likes: postLikes,
+        })
+        .from(posts)
+        .leftJoin(postLikes, eq(posts.postId, postLikes.postId))
+        .where(eq(posts.postId, postId)) // Filter by the given postId
+        .orderBy(desc(posts.createdAt));
+  
+    
+        if (tweets) {
+          // Group likes by postId
+          const postsMap = tweets.reduce((acc, tweet) => {
+            const postId = tweet.post.postId;
+      
+            if (!acc[postId]) {
+              acc[postId] = {
+                postId: tweet.post.postId,
+                id: tweet.post.id,
+                name: tweet.post.name,
+                content: tweet.post.content,
+                likes: [],
+                createdAt: tweet.post.createdAt,
+              };
+            }
+      
+            // Add the like to the respective post's likes array if it exists
+            if (tweet.likes) {
+              acc[postId].likes.push(tweet.likes);
+            }
+      
+            return acc;
+          }, {});
+      
+          // Convert the object back into an array
+          return Object.values(postsMap);
+        }
+  
+      return null;
+    }),
   // getLatest: protectedProcedure.query(async ({ ctx }) => {
   //   const post = await ctx.db.query.posts.findMany({
   //     orderBy: (posts, { desc }) => [desc(posts.createdAt)],

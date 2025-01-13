@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { api } from "@/trpc/react";
 import { MessageCircle, Heart, Repeat2, Share } from "lucide-react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 interface Tweet {
   postId: string; // The unique identifier for the post
   id: string; // ID of the post
@@ -21,12 +23,28 @@ interface Like {
 }
 
 export function Feed({ userId }: { userId: string }) {
-  const { data } = api.post.getPostsWithDetails.useQuery();
+  const { data, isLoading, refetch, isFetching } =
+    api.post.getPostsWithDetails.useQuery(
+      undefined, // Pass query parameters here if needed
+      {
+        staleTime: 1000 * 60 * 5, // Data is fresh for 5 minutes
+
+        refetchOnWindowFocus: false, // Prevent refetch on window focus
+        enabled: true, // Ensure this is set to false if conditional fetching is required
+      },
+    );
+
+  const router = useRouter();
+
+  // Optional: Use refetch explicitly when needed
+  useEffect(() => {
+    if (!data) {
+      void refetch();
+    }
+  }, [data, refetch]);
+
   const likes = api.post.incrementLikes.useMutation();
 
-  if (!data) {
-    return <div>loading</div>;
-  }
   function getRelativeTime(timestamp: string | Date): string {
     const now = new Date();
     const createdAt = new Date(timestamp);
@@ -70,13 +88,18 @@ export function Feed({ userId }: { userId: string }) {
   const handleLike = (postId: string) => {
     likes.mutate({ postId: postId });
   };
-  const handleComment = () => {
-    console.log("comment");
+  const handleComment = (postId: string) => {
+    router.push(`/feed/${postId}`);
   };
   const handleShare = () => {
     console.log("share");
   };
-
+  if (isLoading || isFetching) {
+    return <div>Loading...</div>;
+  }
+  if (!data) {
+    return <div>no data</div>;
+  }
   return (
     <div>
       {(data as Tweet[]).map((tweet: Tweet) => (
@@ -99,7 +122,11 @@ export function Feed({ userId }: { userId: string }) {
               <p className="mt-2 whitespace-pre-wrap">{tweet.content}</p>
 
               <div className="text-muted-foreground mt-4 flex justify-between">
-                <Button onClick={handleComment} variant="default" size="icon">
+                <Button
+                  onClick={() => handleComment(tweet.postId)}
+                  variant="default"
+                  size="icon"
+                >
                   <MessageCircle className="h-4 w-4" />
                 </Button>
 
