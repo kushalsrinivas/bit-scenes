@@ -8,6 +8,7 @@ import { MessageCircle, Heart, Repeat2, Share } from "lucide-react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 interface Tweet {
+  parentId: string | null; // The unique identifier for the post
   postId: string; // The unique identifier for the post
   id: string; // ID of the post
   name: string; // Name of the user who created the post
@@ -102,57 +103,74 @@ export function Feed({ userId }: { userId: string }) {
   }
   return (
     <div>
-      {(data as Tweet[]).map((tweet: Tweet) => (
-        <Card key={tweet.id} className="rounded-none border-x-0 border-t-0 p-4">
-          <div className="flex gap-4">
-            <Avatar>
-              <AvatarImage className="bg-white" src={""} />
-              <AvatarFallback className="bg-white">
-                {tweet.name.substring(0, 3)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">@{tweet.name}</span>
-                <span className="text-muted-foreground">·</span>
-                <span className="text-muted-foreground">
-                  {getRelativeTime(tweet.createdAt)}
-                </span>
-              </div>
-              <p className="mt-2 whitespace-pre-wrap">{tweet.content}</p>
+      {(data as Tweet[]).map((tweet: Tweet) => {
+        return (
+          <div key={tweet.id}>
+            {!tweet.parentId && (
+              <Card
+                key={tweet.id}
+                className="rounded-none border-x-0 border-t-0 p-4"
+              >
+                <div className="flex gap-4">
+                  <Avatar>
+                    <AvatarImage className="bg-white" src={""} />
+                    <AvatarFallback className="bg-white">
+                      {tweet.name.substring(0, 3)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">
+                        @{tweet.name}
+                      </span>
+                      <span className="text-muted-foreground">·</span>
+                      <span className="text-muted-foreground">
+                        {getRelativeTime(tweet.createdAt)}
+                      </span>
+                    </div>
+                    <p className="mt-2 whitespace-pre-wrap">{tweet.content}</p>
 
-              <div className="text-muted-foreground mt-4 flex justify-between">
-                <Button
-                  onClick={() => handleComment(tweet.postId)}
-                  variant="default"
-                  size="icon"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                </Button>
+                    <div className="text-muted-foreground mt-4 flex justify-between">
+                      <Button
+                        onClick={() => handleComment(tweet.postId)}
+                        variant="default"
+                        size="icon"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                      </Button>
 
-                <Button
-                  onClick={() => {
-                    handleLike(tweet.postId);
-                  }}
-                  variant="default"
-                  size="icon"
-                  disabled={
-                    (tweet.likes.length > 0 &&
-                      tweet.likes.some((like) => like.userId === userId)) ||
-                    tweet.likes.length === 0
-                  }
-                >
-                  <Heart className="h-4 w-4" />
-                  {tweet.likes.length === 0 ? 1 : tweet.likes.length}
-                </Button>
-                <Button onClick={handleShare} variant="default" size="icon">
-                  <Share className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+                      <Button
+                        onClick={() => {
+                          handleLike(tweet.postId);
+                        }}
+                        variant="default"
+                        size="icon"
+                        disabled={
+                          (tweet.likes.length > 0 &&
+                            tweet.likes.some(
+                              (like) => like.userId === userId,
+                            )) ||
+                          tweet.likes.length === 0
+                        }
+                      >
+                        <Heart className="h-4 w-4" />
+                        {tweet.likes.length === 0 ? 1 : tweet.likes.length}
+                      </Button>
+                      <Button
+                        onClick={handleShare}
+                        variant="default"
+                        size="icon"
+                      >
+                        <Share className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )}
           </div>
-        </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }

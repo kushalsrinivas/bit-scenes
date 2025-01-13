@@ -1,0 +1,1 @@
+ALTER TABLE "bitscenes_post" ALTER COLUMN "parent_post_id" SET DATA TYPE varchar(255);

@@ -1,11 +1,7 @@
-import React from 'react';
+import React from "react";
 
 function page() {
-    return (
-        <div>
-            confessions
-        </div>
-    );
+  return <div>comming soon</div>;
 }
 
 export default page;

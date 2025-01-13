@@ -21,7 +21,8 @@ export const postRouter = createTRPCRouter({
     .input(
       z.object({
         userId: z.string().min(1), // User ID from the students table
-        content: z.string().min(1), // Post content
+        content: z.string().min(1),
+        parentId : z.string().optional(), // Post content
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -39,6 +40,7 @@ export const postRouter = createTRPCRouter({
         name : student.username,
         createdById: ctx.session.user.id,
         content: input.content,
+        parentPostId : input.parentId,
         // Optionally include student data in the post or logs
       });
   
@@ -94,6 +96,7 @@ export const postRouter = createTRPCRouter({
     
           if (!acc[postId]) {
             acc[postId] = {
+              parentId : tweet.post.parentPostId,
               postId: tweet.post.postId,
               id: tweet.post.id,
               name: tweet.post.name,
@@ -163,6 +166,52 @@ export const postRouter = createTRPCRouter({
   
       return null;
     }),
+    getPostsByParentId: protectedProcedure
+  .input(z.object({ parentPostId: z.string() })) // Validate the input
+  .query(async ({ ctx, input }) => {
+    const { parentPostId } = input;
+
+    // Fetch posts and likes where the parentPostId matches the input
+    const tweets = await ctx.db
+      .select({
+        post: posts,
+        likes: postLikes,
+      })
+      .from(posts)
+      .leftJoin(postLikes, eq(posts.postId, postLikes.postId))
+      .where(eq(posts.parentPostId, parentPostId)) // Filter by parentPostId
+      .orderBy(desc(posts.createdAt));
+
+    if (tweets) {
+      // Group likes by postId
+      const postsMap = tweets.reduce((acc, tweet) => {
+        const postId = tweet.post.postId;
+
+        if (!acc[postId]) {
+          acc[postId] = {
+            postId: tweet.post.postId,
+            id: tweet.post.id,
+            name: tweet.post.name,
+            content: tweet.post.content,
+            likes: [],
+            createdAt: tweet.post.createdAt,
+          };
+        }
+
+        // Add the like to the respective post's likes array if it exists
+        if (tweet.likes) {
+          acc[postId].likes.push(tweet.likes);
+        }
+
+        return acc;
+      }, {});
+
+      // Convert the object back into an array
+      return Object.values(postsMap);
+    }
+
+    return tweets ?? null;
+  }),
   // getLatest: protectedProcedure.query(async ({ ctx }) => {
   //   const post = await ctx.db.query.posts.findMany({
   //     orderBy: (posts, { desc }) => [desc(posts.createdAt)],

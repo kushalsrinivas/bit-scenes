@@ -1,17 +1,35 @@
+"use client";
 import { useParams, useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MessageCircle, Heart, Share } from "lucide-react"; // Adjust icons import if needed
-import { useEffect } from "react";
 
-interface CommentProps {
-  userId: string;
+import {
+  MessageCircle,
+  Heart,
+  Repeat2,
+  Bookmark,
+  Share,
+  MoreHorizontal,
+} from "lucide-react";
+import { formatNumber } from "@/lib/utils";
+interface Tweet {
+  postId: string; // The unique identifier for the post
+  id: string; // ID of the post
+  name: string; // Name of the user who created the post
+  content: string; // The content of the post
+  likes: Like[]; // Array of likes for the post
+  createdAt: string; // Timestamp of when the post was created
 }
 
-export function Comment({ userId }: CommentProps) {
+interface Like {
+  likeId: string; // Unique identifier for the like
+  userId: string; // ID of the user who liked the post
+  createdAt: string; // Timestamp of when the like was created
+}
+export function PostDetail({ userId }: { userId: string }) {
   const { id } = useParams(); // Ensure this returns the correct `postId`
   const router = useRouter();
 
@@ -54,10 +72,6 @@ export function Comment({ userId }: CommentProps) {
     likes.mutate({ postId: postId });
   };
 
-  const handleComment = (postId: string) => {
-    router.push(`/feed/${postId}`);
-  };
-
   const handleShare = () => {
     console.log("share");
   };
@@ -65,55 +79,50 @@ export function Comment({ userId }: CommentProps) {
   if (isLoading) return <div>Loading...</div>;
   if (error || !tweet) return <div>Failed to load post.</div>;
 
-  const post = tweet[0]; // Assuming `tweet` is an array
+  const post: Tweet = tweet[0]; // Assuming `tweet` is an array
 
   return (
-    <div>
-      <Card className="rounded-none border-x-0 border-t-0 p-4">
-        <div className="flex gap-4">
-          <Avatar>
-            <AvatarImage className="bg-white" src="" alt="Avatar" />
-            <AvatarFallback className="bg-white">
-              {post.name.substring(0, 3).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">@{post.name}</span>
-              <span className="text-muted-foreground">·</span>
-              <span className="text-muted-foreground">
-                {getRelativeTime(post.createdAt)}
-              </span>
-            </div>
-            <p className="mt-2 whitespace-pre-wrap">{post.content}</p>
+    <div className="border-b border-border">
+      <div>
+        <Card className="rounded-none border-x-0 border-t-0 p-4">
+          <div className="flex gap-4">
+            <Avatar>
+              <AvatarImage className="bg-white" src="" alt="Avatar" />
+              <AvatarFallback className="bg-white">
+                {post.name.substring(0, 3).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">@{post.name}</span>
+                <span className="text-muted-foreground">·</span>
+                <span className="text-muted-foreground">
+                  {getRelativeTime(post.createdAt)}
+                </span>
+              </div>
+              <p className="mt-2 whitespace-pre-wrap">{post.content}</p>
 
-            <div className="text-muted-foreground mt-4 flex justify-between">
-              <Button
-                onClick={() => handleComment(post.postId)}
-                variant="default"
-                size="icon"
-              >
-                <MessageCircle className="h-4 w-4" />
-              </Button>
-              <Button
-                onClick={() => handleLike(post.postId)}
-                variant="default"
-                size="icon"
-                disabled={
-                  post.likes.some((like) => like.userId === userId) ||
-                  post.likes.length === 0
-                }
-              >
-                <Heart className="h-4 w-4" />
-                {post.likes.length === 0 ? 1 : post.likes.length}
-              </Button>
-              <Button onClick={handleShare} variant="default" size="icon">
-                <Share className="h-4 w-4" />
-              </Button>
+              <div className="text-muted-foreground mt-4 flex justify-between">
+                <Button
+                  onClick={() => handleLike(post.postId)}
+                  variant="default"
+                  size="icon"
+                  disabled={
+                    post.likes.some((like) => like.userId === userId) ||
+                    post.likes.length === 0
+                  }
+                >
+                  <Heart className="h-4 w-4" />
+                  {post.likes.length === 0 ? 1 : post.likes.length}
+                </Button>
+                <Button onClick={handleShare} variant="default" size="icon">
+                  <Share className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -52,7 +52,7 @@ export const posts = createTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    parentPostId : integer("parent_post_id"),
+    parentPostId : varchar("parent_post_id", { length: 255 }),
 
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date()

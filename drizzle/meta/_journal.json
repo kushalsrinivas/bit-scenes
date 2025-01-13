@@ -78,6 +78,13 @@
       "when": 1736718636086,
       "tag": "0010_fine_ken_ellis",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1736756315580,
+      "tag": "0011_curved_goblin_queen",
+      "breakpoints": true
     }
   ]
 }
