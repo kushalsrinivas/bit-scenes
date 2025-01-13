@@ -3,8 +3,6 @@ import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
-import { TRPCReactProvider } from "@/trpc/react";
-import { Sidebar } from "@/components/common/SideBar";
 import { LeftSidebar } from "@/components/common/LeftSideBar";
 import { RightSidebar } from "@/components/common/RightSideBar";
 

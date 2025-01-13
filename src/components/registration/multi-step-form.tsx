@@ -17,13 +17,28 @@ import { InterestsStep } from "./interests-step";
 import { api } from "@/trpc/react";
 
 import { useRouter } from "next/navigation";
+interface SocialLinks {
+  github: string;
+  linkedin: string;
+  twitter: string;
+  [platform: string]: string; // For dynamic keys
+}
 
+// Define FormData interface
+interface FormData {
+  userId: string;
+  usn: string;
+  username: string;
+  branch: string;
+  socialLinks: SocialLinks;
+  interests: string[];
+}
 const steps = ["USN & Username", "Branch", "Social Links", "Interests"];
 
 export function MultiStepForm({ userId }: { userId: string }) {
   const [currentStep, setCurrentStep] = useState(0);
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     userId: userId,
     usn: "",
     username: "",

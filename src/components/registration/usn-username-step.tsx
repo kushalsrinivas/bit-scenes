@@ -1,7 +1,14 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+interface USNUsernameStepProps {
+  data: {
+    usn: string;
+    username: string;
+  };
+  updateData: (newData: { usn?: string; username?: string }) => void;
+}
 
-export function USNUsernameStep({ data, updateData }) {
+export function USNUsernameStep({ data, updateData }: USNUsernameStepProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">

@@ -3,20 +3,7 @@
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Home,
-  Search,
-  Bell,
-  Mail,
-  Users,
-  Bookmark,
-  User,
-  MoreHorizontal,
-  Twitter,
-  Mic,
-  ClipboardCheck,
-  Voicemail,
-} from "lucide-react";
+import { Home, User, ClipboardCheck, Voicemail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [

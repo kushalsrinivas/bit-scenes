@@ -4,23 +4,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { api } from "@/trpc/react";
-import { MessageCircle, Heart, Repeat2, Share } from "lucide-react";
+import { MessageCircle, Heart, Share } from "lucide-react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 interface Tweet {
-  parentId: string | null; // The unique identifier for the post
-  postId: string; // The unique identifier for the post
-  id: string; // ID of the post
-  name: string; // Name of the user who created the post
-  content: string; // The content of the post
-  likes: Like[]; // Array of likes for the post
-  createdAt: string; // Timestamp of when the post was created
-}
-
-interface Like {
-  likeId: string; // Unique identifier for the like
-  userId: string; // ID of the user who liked the post
-  createdAt: string; // Timestamp of when the like was created
+  parentId: string | null; // Assuming parentPostId can be null
+  postId: string;
+  id: number;
+  name: string;
+  content: string;
+  likes: Array<{ userId: string; postId: string; id: string }>; // Adjust the structure of likes based on your data
+  createdAt: Date;
 }
 
 export function Feed({ userId }: { userId: string }) {

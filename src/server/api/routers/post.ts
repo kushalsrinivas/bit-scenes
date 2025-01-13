@@ -5,9 +5,19 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
-import { postLikes, posts, students } from "@/server/db/schema";
-import { desc, eq, like, sql } from "drizzle-orm";
+import { postLikes, posts,  } from "@/server/db/schema";
+import { desc, eq,  } from "drizzle-orm";
+interface PostWithLikes {
+  parentId: string | null; // Assuming parentPostId can be null
+  postId: string;
+  id: number;
+  name: string;
+  content: string;
+  likes: Array<{ userId: string; postId: string , id : string }>; // Adjust the structure of likes based on your data
+  createdAt: Date;
+}
 
+type PostsMap = Record<string, PostWithLikes>;
 export const postRouter = createTRPCRouter({
   hello: publicProcedure
     .input(z.object({ text: z.string() }))
@@ -91,28 +101,30 @@ export const postRouter = createTRPCRouter({
     
       if (tweets) {
         // Group likes by postId
-        const postsMap = tweets.reduce((acc, tweet) => {
+        const postsMap: PostsMap = tweets.reduce((acc: PostsMap, tweet) => {
           const postId = tweet.post.postId;
-    
+        
           if (!acc[postId]) {
             acc[postId] = {
-              parentId : tweet.post.parentPostId,
+              parentId: tweet.post.parentPostId,
               postId: tweet.post.postId,
               id: tweet.post.id,
-              name: tweet.post.name,
-              content: tweet.post.content,
+              name: tweet.post.name!,
+              content: tweet.post.content!,
               likes: [],
               createdAt: tweet.post.createdAt,
             };
           }
-    
+        
           // Add the like to the respective post's likes array if it exists
           if (tweet.likes) {
             acc[postId].likes.push(tweet.likes);
           }
-    
+        
           return acc;
         }, {});
+    
+        
     
         // Convert the object back into an array
         return Object.values(postsMap);
@@ -138,15 +150,16 @@ export const postRouter = createTRPCRouter({
     
         if (tweets) {
           // Group likes by postId
-          const postsMap = tweets.reduce((acc, tweet) => {
+          const postsMap : PostsMap = tweets.reduce((acc : PostsMap, tweet) => {
             const postId = tweet.post.postId;
       
             if (!acc[postId]) {
               acc[postId] = {
+                parentId : "",
                 postId: tweet.post.postId,
                 id: tweet.post.id,
-                name: tweet.post.name,
-                content: tweet.post.content,
+                name: tweet.post.name!,
+                content: tweet.post.content!,
                 likes: [],
                 createdAt: tweet.post.createdAt,
               };
@@ -184,15 +197,16 @@ export const postRouter = createTRPCRouter({
 
     if (tweets) {
       // Group likes by postId
-      const postsMap = tweets.reduce((acc, tweet) => {
+      const postsMap : PostsMap= tweets.reduce((acc : PostsMap, tweet) => {
         const postId = tweet.post.postId;
 
         if (!acc[postId]) {
           acc[postId] = {
+            parentId: "",
             postId: tweet.post.postId,
             id: tweet.post.id,
-            name: tweet.post.name,
-            content: tweet.post.content,
+            name: tweet.post.name!,
+            content: tweet.post.content!,
             likes: [],
             createdAt: tweet.post.createdAt,
           };

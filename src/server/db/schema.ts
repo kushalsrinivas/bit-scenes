@@ -3,7 +3,7 @@ import {
   index,
   integer,
   json,
-  numeric,
+
   pgTableCreator,
   primaryKey,
   text,

@@ -4,14 +4,7 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Image,
-  FileVideo,
-  ListTodo,
-  MapPin,
-  Smile,
-  Calendar,
-} from "lucide-react";
+
 import { api } from "@/trpc/react";
 
 export function ComposePost({ userId }: { userId: string }) {

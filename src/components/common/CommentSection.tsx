@@ -4,30 +4,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import {
-  Image,
-  FileVideo,
-  ListTodo,
-  MapPin,
-  Smile,
-  Calendar,
-} from "lucide-react";
+
 import { useState } from "react";
 import { api } from "@/trpc/react";
 import { useParams } from "next/navigation";
 interface Tweet {
-  postId: string; // The unique identifier for the post
-  id: string; // ID of the post
-  name: string; // Name of the user who created the post
-  content: string; // The content of the post
-  likes: Like[]; // Array of likes for the post
-  createdAt: string; // Timestamp of when the post was created
-}
-
-interface Like {
-  likeId: string; // Unique identifier for the like
-  userId: string; // ID of the user who liked the post
-  createdAt: string; // Timestamp of when the like was created
+  parentId: string | null; // Assuming parentPostId can be null
+  postId: string;
+  id: number;
+  name: string;
+  content: string;
+  likes: Array<{ userId: string; postId: string; id: string }>; // Adjust the structure of likes based on your data
+  createdAt: Date;
 }
 export function CommentSection({ userId }: { userId: string }) {
   const { id } = useParams();
